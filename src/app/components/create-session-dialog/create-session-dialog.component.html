@@ -1,0 +1,60 @@
+<h2 mat-dialog-title>Create Session</h2>
+<mat-dialog-content>
+  <form [formGroup]="sessionForm">
+    <div class="create-session__content">
+      <div class="create-session__content-ctrlSpacing">
+        <mat-form-field>
+          <mat-label>Title</mat-label>
+          <input
+            matInput
+            formControlName="title"
+            placeholder="Enter Title"
+            required
+          />
+          <mat-error *ngIf="sessionForm.get('title')?.hasError('required')">
+            Title is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="create-session__content-ctrlSpacing">
+        <mat-form-field>
+          <mat-label>Choose one</mat-label>
+          <mat-select
+            placeholder="Select the deck type"
+            formControlName="deckType"
+            required
+          >
+            <mat-option
+              [value]="deck.description"
+              *ngFor="let deck of this.deckTypes"
+              >{{ deck.description }}</mat-option
+            >
+          </mat-select>
+          <mat-error *ngIf="sessionForm.get('deckType')?.hasError('required')"
+            >Please choose a deck type</mat-error
+          >
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button
+    mat-raised-button
+    cdkFocusInitial
+    color="primary"
+    mat-button
+    mat-dialog-close
+  >
+    Cancel
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    [disabled]="!sessionForm.valid"
+    (click)="createSession()"
+  >
+    Create
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,73 @@
+<mat-card class="story__container">
+  <mat-card-header>
+    <div mat-card-avatar>
+      <mat-icon
+        [matBadge]="
+          status === storyVoteStatus.VOTING ||
+          (status === storyVoteStatus.VOTED && votes > 0)
+            ? votes
+            : null
+        "
+        matBadgeColor="accent"
+        matTooltip="Votes emitted"
+        >how_to_vote</mat-icon
+      >
+    </div>
+    <mat-card-title>{{ description | uppercase }}</mat-card-title>
+    <mat-card-subtitle>{{ status | uppercase }}</mat-card-subtitle>
+  </mat-card-header>
+  <mat-card-actions align="end">
+    <div class="story__buttons-content">
+      <button
+        *ngIf="
+          status === storyVoteStatus.PENDING || status === storyVoteStatus.VOTED
+        "
+        mat-mini-fab
+        color="accent"
+        aria-label="Icon start voting process"
+        matTooltip="Start voting process"
+        (click)="startVotingClicked.emit(id)"
+      >
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+      <button
+        *ngIf="status === storyVoteStatus.VOTING"
+        mat-mini-fab
+        color="accent"
+        aria-label="Icon stop voting process"
+        matTooltip="Stop voting process"
+        (click)="stopVotingClicked.emit(id)"
+      >
+        <mat-icon>stop</mat-icon>
+      </button>
+      <button
+        *ngIf="status === storyVoteStatus.VOTING"
+        mat-mini-fab
+        color="accent"
+        aria-label="Icon button with a thumb up icon"
+        (click)="voteEmittedButtonClicked(id)"
+      >
+        <mat-icon>thumb_up</mat-icon>
+      </button>
+      <button
+        *ngIf="status === storyVoteStatus.VOTING"
+        mat-mini-fab
+        color="accent"
+        aria-label="Icon button with a thumb down icon"
+        (click)="voteEmittedButtonClicked(id)"
+      >
+        <mat-icon>thumb_down</mat-icon>
+      </button>
+      <button
+        *ngIf="status === storyVoteStatus.PENDING"
+        mat-mini-fab
+        color="accent"
+        aria-label="Icon button with a heart icon"
+        matTooltip="Delete user story"
+        (click)="deleteClicked.emit(id)"
+      >
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </mat-card-actions>
+</mat-card>

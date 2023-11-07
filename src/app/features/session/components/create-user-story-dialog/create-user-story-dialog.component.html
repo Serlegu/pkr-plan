@@ -1,0 +1,61 @@
+<h2 mat-dialog-title>Create User Story</h2>
+<mat-dialog-content>
+  <form [formGroup]="userStoryForm">
+    <div class="create-userStory__content">
+      <div class="create-userStory__content-ctrlSpacing">
+        <mat-form-field>
+          <mat-label>Id</mat-label>
+          <input
+            matInput
+            formControlName="id"
+            placeholder="Enter story id"
+            required
+          />
+          <mat-error *ngIf="userStoryForm.get('id')?.hasError('required')">
+            Id is required
+          </mat-error>
+          <mat-error *ngIf="userStoryForm.get('id')?.hasError('pattern')">
+            Only numeric numbers allowed
+          </mat-error>
+        </mat-form-field>
+      </div>
+      <div class="create-userStory__content-ctrlSpacing">
+        <mat-form-field>
+          <mat-label>Description</mat-label>
+
+          <input
+            matInput
+            formControlName="description"
+            placeholder="Enter description"
+            required
+          />
+          <mat-error
+            *ngIf="userStoryForm.get('description')?.hasError('required')"
+          >
+            Description is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button
+    mat-raised-button
+    cdkFocusInitial
+    color="primary"
+    mat-button
+    mat-dialog-close
+  >
+    Cancel
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    [mat-dialog-close]="true"
+    [disabled]="!userStoryForm.valid"
+    (click)="create()"
+  >
+    Create
+  </button>
+</mat-dialog-actions>

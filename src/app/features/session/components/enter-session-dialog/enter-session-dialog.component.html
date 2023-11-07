@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Enter Session</h2>
+<mat-dialog-content>
+  <form [formGroup]="enterSessionForm">
+    <mat-form-field>
+      <input
+        matInput
+        formControlName="nickname"
+        placeholder="Enter name/nickname"
+        required
+      />
+      <mat-error *ngIf="enterSessionForm.get('nickname')?.hasError('required')">
+        Nickname is required
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button
+    mat-raised-button
+    cdkFocusInitial
+    color="primary"
+    mat-button
+    mat-dialog-close
+  >
+    Cancel
+  </button>
+  <button
+    mat-raised-button
+    color="primary"
+    [mat-dialog-close]="true"
+    [disabled]="!enterSessionForm.valid"
+    (click)="create()"
+  >
+    Create
+  </button>
+</mat-dialog-actions>

@@ -1,0 +1,74 @@
+<div class="session__container">
+  <mat-card class="session__container-title">
+    <mat-card-content>
+      <div class="session__container-cardContent">
+        <button
+          mat-mini-fab
+          color="primary"
+          aria-label="Icon button with a group icon"
+          matTooltip="Members joined in the session"
+          [matBadge]="current.members?.length"
+          matBadgeColor="accent"
+          (click)="copySessionLink()"
+        >
+          <mat-icon>group</mat-icon>
+        </button>
+        <div>Session: {{ current.title | uppercase }}</div>
+        <div class="session__container-cardContentButtons">
+          <button
+            mat-mini-fab
+            color="primary"
+            aria-label="Icon button with a heart icon"
+            matTooltip="Copy session link to clipboard"
+            (click)="copySessionLink()"
+          >
+            <mat-icon>content_copy</mat-icon>
+          </button>
+
+          <button
+            mat-mini-fab
+            color="warn"
+            aria-label="Icon button with a heart icon"
+            matTooltip="Destroy session"
+            (click)="destroySession()"
+          >
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card class="session__container-title">
+    <mat-card-content>
+      <div class="session__container-userStoryListTitle">
+        <div>Stories List</div>
+        <div class="session__container-cardContentButtons">
+          <button
+            mat-mini-fab
+            color="primary"
+            cdkFocusInitial
+            aria-label="Add user story icon button with an add icon"
+            (click)="createUserStory()"
+          >
+            <mat-icon>add_circle</mat-icon>
+          </button>
+        </div>
+      </div>
+      <div class="storiesList__container">
+        <div *ngFor="let story of current?.stories; trackBy: trackById">
+          <pkr-card
+            [description]="story.description"
+            [status]="story.status"
+            [id]="story.id"
+            [votes]="story.votes"
+            (deleteClicked)="deleteUserStory($event)"
+            (startVotingClicked)="startVotingProcess($event)"
+            (voteEmittedClicked)="voteEmittedClicked($event)"
+            (stopVotingClicked)="stopVotingClicked($event)"
+          ></pkr-card>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,9 @@
+{
+  "/frontconfig": {
+    "pathRewrite": {
+      "^/frontconfig": "/assets/config.json"
+    },
+    "secure": false,
+    "target": "http://localhost:4200"
+  }
+}

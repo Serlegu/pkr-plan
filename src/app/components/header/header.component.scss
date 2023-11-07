@@ -1,0 +1,15 @@
+@import "../../../assets/styles/variables";
+
+.header__container {
+  background: $color-primary-01;
+  height: $size-spacing-09;
+
+  .header__title {
+    margin-left: 5px;
+    color: #ffd740;
+  }
+
+  .header__spacer {
+    flex: 1 1 auto;
+  }
+}

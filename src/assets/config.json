@@ -1,0 +1,26 @@
+{
+  "app": {
+    "language": "en",
+    "modalConfig": {
+      "disableClose": true,
+      "height": "auto",
+      "width": "auto"
+    },
+    "name": "PKR_PLN",
+    "rest": {
+      "endpoints": {
+        "getSessionList": {
+          "method": "GET",
+          "uri": "sessions/"
+        }
+      },
+      "headers": {
+        "acceptLanguage": "en-GB"
+      },
+      "host": "TBD",
+      "port": null
+    }
+  },
+  "baseUrl": "http://localhost:3000",
+  "wsUrl": "ws://localhost:8080"
+}

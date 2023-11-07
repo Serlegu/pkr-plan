@@ -1,0 +1,18 @@
+<button
+  mat-icon-button
+  color="accent"
+  [matMenuTriggerFor]="menu"
+  aria-label="poker planning icon menu button"
+>
+  <mat-icon>list</mat-icon>
+</button>
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="enterSessionButtonClicked()">
+    <mat-icon>add_circle_outline</mat-icon>
+    <span>Create Session</span>
+  </button>
+  <button mat-menu-item (click)="createSessionButtonClicked()">
+    <mat-icon>login</mat-icon>
+    <span>Enter Session</span>
+  </button>
+</mat-menu>

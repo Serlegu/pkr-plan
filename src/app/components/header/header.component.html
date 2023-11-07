@@ -1,0 +1,16 @@
+<mat-toolbar class="header__container">
+  <pkr-menu
+    (createSessionClicked)="createSession('create')"
+    (enterSessionClicked)="enterSession('enter')"
+  ></pkr-menu>
+  <span class="header__title">Poker Planning</span>
+  <span class="header__spacer"></span>
+  <button
+    mat-icon-button
+    color="accent"
+    aria-label="Example icon-button with logout icon"
+    matTooltip="Logout (Under construction...)"
+  >
+    <mat-icon>logout</mat-icon>
+  </button>
+</mat-toolbar>
