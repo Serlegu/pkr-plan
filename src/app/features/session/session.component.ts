@@ -2,8 +2,7 @@ import { Clipboard } from '@angular/cdk/clipboard';
 import { Component, Input, OnInit, numberAttribute } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
-import { Subject, filter, of, switchMap, takeUntil } from 'rxjs';
-import { CreateSessionDialogComponent } from '../../components/create-session-dialog/create-session-dialog.component';
+import { Subject, filter, of, pipe, switchMap, takeUntil } from 'rxjs';
 import { ISession } from '../../models/session.interface';
 import { StoryVoteStatus } from '../../models/story-status.enum';
 import { ConfigService } from '../../services/config.service';
@@ -38,12 +37,9 @@ export class SessionComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.socketService
-      .getMessage$()
-      .subscribe(
-        (session: ISession) =>
-          (this.current = JSON.parse(JSON.stringify(session)))
-      );
+    this.getSessionUpdatedMessage();
+
+    this.getSessionDeletedMessage();
 
     this.route.queryParamMap
       .pipe(
@@ -89,20 +85,39 @@ export class SessionComponent implements OnInit {
       });
   }
 
-  createSession() {
-    const dialogRef = this.dialog.open(CreateSessionDialogComponent);
+  private getSessionUpdatedMessage() {
+    this.socketService
+      .getMessage$('session-updated')
+      .pipe(takeUntil(this.notifier$))
+      .subscribe(
+        (session: ISession) =>
+          (this.current = JSON.parse(JSON.stringify(session)))
+      );
+  }
 
-    dialogRef
-      .afterClosed()
+  private getSessionDeletedMessage() {
+    this.socketService
+      .getMessage$('session-deleted')
       .pipe(
-        filter((accept) => accept),
-        switchMap((session) => {
-          return this.sessionService.create({ id: 0, ...session });
+        switchMap(() => {
+          return this.modalInfoService
+            .open({
+              title: 'Session closed',
+              msg: 'I am afraid somebody destroyed the current session... ask the administrator to create a new one',
+              cancelDisplayed: false,
+            })
+            .afterClosed()
+            .pipe(
+              filter((accept) => accept),
+              switchMap(() => of('session deleted'))
+            );
         }),
         takeUntil(this.notifier$)
       )
-      .subscribe((newSessionId) => {
-        this.router.navigate([`/session/${newSessionId}`]);
+      .subscribe((result) => {
+        if (result === 'session deleted') {
+          this.goToHomePage();
+        }
       });
   }
 
@@ -110,7 +125,10 @@ export class SessionComponent implements OnInit {
     const dialogRef = this.dialog.open(CreateUserStoryDialogComponent);
     dialogRef
       .afterClosed()
-      .pipe(filter((accept) => accept))
+      .pipe(
+        filter((accept) => accept),
+        takeUntil(this.notifier$)
+      )
       .subscribe((userStory) => {
         this.sessionService.createUserStory(this.current, {
           status: StoryVoteStatus.PENDING,
@@ -148,6 +166,7 @@ export class SessionComponent implements OnInit {
     const dialogRef = this.modalInfoService.open({
       title: 'Destroy Session',
       msg: 'You are about to destroy the session... are you sure?',
+      cancelDisplayed: true,
     });
     dialogRef
       .afterClosed()

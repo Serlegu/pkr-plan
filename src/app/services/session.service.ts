@@ -20,16 +20,18 @@ export class SessionService {
     private readonly socketService: SocketService
   ) {}
 
-  maxId = 0;
+  private getSessionStorage(): ISession[] {
+    return (
+      this.storageService.local.getItem(this.configService.config.app?.name) ||
+      {}
+    );
+  }
 
-  getById(id: Number): Observable<ISession> {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
+  getById(id: number): Observable<ISession> {
+    const sessionsConfigFromStorage = this.getSessionStorage();
     const session = sessionsConfigFromStorage.find(
       (session) => session.id === id
     ) as ISession;
-
     return of(session);
   }
 
@@ -59,216 +61,110 @@ export class SessionService {
     return of(newSessionId);
   }
 
-  delete(sessionId: number) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
+  updateSession(session: ISession) {
+    const sessionsConfigFromStorage = this.getSessionStorage();
+    const index = sessionsConfigFromStorage.findIndex(
+      (sfs) => sfs.id === session.id
+    );
+    if (index !== -1) {
+      sessionsConfigFromStorage[index] = session;
+      this.storageService.local.setItem(
+        this.configService.config.app?.name,
+        sessionsConfigFromStorage
+      );
+      this.sessionUpdated(session);
+    }
+  }
 
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
+  delete(sessionId: number) {
+    const sessionsConfigFromStorage = this.getSessionStorage();
+    const index = sessionsConfigFromStorage.findIndex(
       (sfs) => sfs.id === sessionId
     );
-
-    if (currentSessionIndex !== -1) {
-      sessionsConfigFromStorage.splice(currentSessionIndex, 1);
-    }
-
+    if (index !== -1) {
+      sessionsConfigFromStorage.splice(index, 1);
     this.storageService.local.setItem(
       this.configService.config.app?.name,
       sessionsConfigFromStorage
     );
-
-    this.socketService.sendMessage(
-      'session-updated',
-      sessionsConfigFromStorage
-    );
+      this.sessionDeleted();
+    }
   }
 
   createUserStory(session: ISession, userStory: IUserStory) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
-    session.stories = [...(session.stories || []), userStory];
-
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
-      (sfs) => sfs.id === session.id
-    );
-
-    if (currentSessionIndex !== -1) {
-      sessionsConfigFromStorage[currentSessionIndex] = session;
-    } else {
-      sessionsConfigFromStorage.push(session);
+    if (!session.stories) {
+      session.stories = [];
     }
-    // }
-
-    this.storageService.local.setItem(
-      this.configService.config.app?.name,
-      sessionsConfigFromStorage
-    );
-
-    this.socketService.sendMessage('session-updated', session);
+    session.stories.push(userStory);
+    this.updateSession(session);
   }
 
   deleteUserStory(session: ISession, userStoryId: number) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
-      (sfs) => sfs.id === session.id
-    );
-
-    if (
-      sessionsConfigFromStorage[currentSessionIndex] &&
-      sessionsConfigFromStorage[currentSessionIndex].stories?.length
-    ) {
-      session.stories = session.stories?.filter(
-        (sessionUserStory) => sessionUserStory.id !== userStoryId
+    if (session.stories) {
+      const index = session.stories.findIndex(
+        (story: IUserStory) => story.id === userStoryId
       );
-      sessionsConfigFromStorage[currentSessionIndex].stories =
-        sessionsConfigFromStorage[currentSessionIndex].stories?.filter(
-          (sus) => sus.id !== userStoryId
-        );
-      this.storageService.local.setItem(
-        this.configService.config.app?.name,
-        sessionsConfigFromStorage
-      );
+      if (index !== -1) {
+        session.stories.splice(index, 1);
+        this.updateSession(session);
+      }
     }
-
-    this.socketService.sendMessage('session-updated', session);
   }
 
   startVotingProcess(session: ISession, userStoryId: number) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
-      (sfs) => sfs.id === session.id
-    );
-
-    if (
-      sessionsConfigFromStorage[currentSessionIndex] &&
-      sessionsConfigFromStorage[currentSessionIndex].stories?.length
-    ) {
-      session.stories = session.stories?.map((sus) => {
-        if (sus.id === userStoryId) {
-          sus.status = StoryVoteStatus.VOTING;
+    if (session.stories) {
+      session.stories = session.stories.map((story) => {
+        if (story.id === userStoryId) {
+          story.status = StoryVoteStatus.VOTING;
         }
-        return sus;
+        return story;
       });
-
-      sessionsConfigFromStorage[currentSessionIndex].stories =
-        sessionsConfigFromStorage[currentSessionIndex].stories?.map((sus) => {
-          if (sus.id === userStoryId) {
-            sus.status = StoryVoteStatus.VOTING;
-          }
-          return sus;
-        });
-
-      this.storageService.local.setItem(
-        this.configService.config.app?.name,
-        sessionsConfigFromStorage
-      );
-
-      this.sessionUpdated(session);
+      this.updateSession(session);
     }
   }
 
   stopVotingProcess(session: ISession, userStoryId: number) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
-      (sfs) => sfs.id === session.id
-    );
-
-    if (
-      sessionsConfigFromStorage[currentSessionIndex] &&
-      sessionsConfigFromStorage[currentSessionIndex].stories?.length
-    ) {
-      session.stories = session.stories?.map((sus) => {
-        if (sus.id === userStoryId) {
-          sus.status = StoryVoteStatus.VOTED;
-        }
-        return sus;
-      });
-
-      sessionsConfigFromStorage[currentSessionIndex].stories =
-        sessionsConfigFromStorage[currentSessionIndex].stories?.map((sus) => {
-          if (sus.id === userStoryId) {
-            sus.status = StoryVoteStatus.VOTED;
+    if (session.stories) {
+      session.stories = session.stories.map((story: IUserStory) => {
+        if (story.id === userStoryId) {
+          story.status = StoryVoteStatus.VOTED;
           }
-          return sus;
+        return story;
         });
-
-      this.storageService.local.setItem(
-        this.configService.config.app?.name,
-        sessionsConfigFromStorage
-      );
-
-      this.sessionUpdated(session);
+      this.updateSession(session);
     }
   }
 
   addMember(session: ISession, member: IMember) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
-      (sfs) => sfs.id === session.id
-    );
-
-    session.members = [
-      ...(session.members || []),
-      {
+    if (!session.members) {
+      session.members = [];
+    }
+    session.members.push({
         ...member,
         id: this.utilsService.getNextIdFromArray(session.members || []),
-      },
-    ];
-
-    if (currentSessionIndex !== -1) {
-      sessionsConfigFromStorage[currentSessionIndex] = session;
-    } else {
-      sessionsConfigFromStorage.push(session);
-    }
-
-    this.storageService.local.setItem(
-      this.configService.config.app?.name,
-      sessionsConfigFromStorage
-    );
+    });
+    this.updateSession(session);
   }
 
   addVotes(session: ISession, storyId: number) {
-    const sessionsConfigFromStorage: ISession[] =
-      this.storageService.local.getItem(this.configService.config.app?.name);
-
-    const currentSessionIndex = sessionsConfigFromStorage.findIndex(
-      (sfs) => sfs.id === session.id
-    );
-
-    session.stories = session.stories?.map((sus) => {
-      if (sus.id === storyId) {
-        sus.votes = ++sus.votes;
+    if (session.stories) {
+      session.stories = session.stories.map((story: IUserStory) => {
+        if (story.id === storyId) {
+          story.votes = (story.votes || 0) + 1;
       }
-      return sus;
+        return story;
     });
 
-    session.votes = session.votes ? ++session.votes : 1;
-
-    sessionsConfigFromStorage[currentSessionIndex].stories =
-      sessionsConfigFromStorage[currentSessionIndex].stories?.map((sus) => {
-        if (sus.id === storyId) {
-          sus.votes = ++sus.votes;
-        }
-        return sus;
-      });
-
-    this.storageService.local.setItem(
-      this.configService.config.app?.name,
-      sessionsConfigFromStorage
-    );
-
-    this.sessionUpdated(session);
+      session.votes = (session.votes || 0) + 1;
+      this.updateSession(session);
+    }
   }
 
   sessionUpdated(session: ISession) {
     this.socketService.sendMessage('session-updated', session);
+  }
+
+  sessionDeleted() {
+    this.socketService.sendMessage('session-deleted', {});
   }
 }

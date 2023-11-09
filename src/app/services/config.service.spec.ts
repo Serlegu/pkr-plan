@@ -2,10 +2,12 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { ConfigService } from './config.service';
 import { configData, configDataTest } from '../models/config-fake.service.spec';
+import { IConfig } from '../models/config.interface';
+import { IconOptions } from '@angular/material/icon';
 
 export function initializeApp(mrwService: ConfigService) {
   return () => {
-    mrwService.config = configData;
+    mrwService.config = configData as IConfig;
   };
 }
 
@@ -37,10 +39,10 @@ describe('ConfigService', () => {
   });
 
   it('should config language', () => {
-    service.config = configData;
+    service.config = configData as IConfig;
     const configAfter = configDataTest;
     service.setConfigService(configAfter);
-    expect(service.config.language).not.toBe('es');
+    expect(service.config.app.language).not.toBe('en');
   });
 
 });

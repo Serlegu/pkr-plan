@@ -16,7 +16,7 @@ export class ModalInfoComponent {
   constructor(
     public dialogRef: MatDialogRef<ModalInfoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IModalData
-  ) {}
+  ) {  }
 
   close(): void {
     this.dialogRef.close(false);

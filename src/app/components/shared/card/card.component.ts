@@ -27,6 +27,8 @@ export class CardComponent {
   @Input() status: StoryVoteStatus = StoryVoteStatus.PENDING;
   @Input() votes = 0;
 
+  color='accent';
+
   @Output() deleteClicked = new EventEmitter<number>();
   @Output() startVotingClicked = new EventEmitter<number>();
   @Output() stopVotingClicked = new EventEmitter<number>();

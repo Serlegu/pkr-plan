@@ -6,7 +6,7 @@ import { map } from 'rxjs';
   providedIn: 'root',
 })
 export class SocketService {
-  constructor(private socket: Socket) {}
+  constructor(private socket: Socket) { }
 
   // emit event
   sendMessage(topic: string, data: any) {
@@ -14,8 +14,8 @@ export class SocketService {
   }
 
   // listen event
-  getMessage$() {
-    return this.socket.fromEvent('notifications').pipe(
+  getMessage$(topicMessage: string) {
+    return this.socket.fromEvent(topicMessage).pipe(
       map((data: any) => {
         return data;
       })

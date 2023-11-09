@@ -23,9 +23,11 @@
           status === storyVoteStatus.PENDING || status === storyVoteStatus.VOTED
         "
         mat-mini-fab
-        color="accent"
+        [color]="color"
         aria-label="Icon start voting process"
         matTooltip="Start voting process"
+        (mouseover)="color = 'warn'"
+        (mouseout)="color = 'accent'"
         (click)="startVotingClicked.emit(id)"
       >
         <mat-icon>play_arrow</mat-icon>

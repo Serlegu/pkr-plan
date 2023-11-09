@@ -10,6 +10,7 @@
             formControlName="id"
             placeholder="Enter story id"
             required
+            cdkFocusInitial
           />
           <mat-error *ngIf="userStoryForm.get('id')?.hasError('required')">
             Id is required

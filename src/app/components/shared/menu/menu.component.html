@@ -7,12 +7,10 @@
   <mat-icon>list</mat-icon>
 </button>
 <mat-menu #menu="matMenu">
-  <button mat-menu-item (click)="enterSessionButtonClicked()">
-    <mat-icon>add_circle_outline</mat-icon>
-    <span>Create Session</span>
-  </button>
-  <button mat-menu-item (click)="createSessionButtonClicked()">
-    <mat-icon>login</mat-icon>
-    <span>Enter Session</span>
-  </button>
+  <ng-container *ngFor="let item of items">
+    <button mat-menu-item (click)="item.clickAction('createSession')">
+      <mat-icon>{{ item.icon }}</mat-icon>
+      <span>{{ item.literal }}</span>
+    </button>
+  </ng-container>
 </mat-menu>

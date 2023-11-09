@@ -6,6 +6,7 @@ import { CommunicationService } from '../../services/communication.service';
 import { ConfigService } from '../../services/config.service';
 import { SessionService } from '../../services/session.service';
 import { CreateSessionDialogComponent } from '../create-session-dialog/create-session-dialog.component';
+import { IDeckType } from 'src/app/models/deck-type.interface';
 
 @Component({
   selector: 'pkr-home',
@@ -14,6 +15,7 @@ import { CreateSessionDialogComponent } from '../create-session-dialog/create-se
 })
 export class HomeComponent implements OnInit, OnDestroy {
   receivedData: string;
+  deckTypes: IDeckType[] = [];
   private readonly notifier$ = new Subject<void>();
 
   constructor(
@@ -25,23 +27,34 @@ export class HomeComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    // this.wsService
-    //   .getMessage$()
-    //   .subscribe((message) =>
-    //     console.warn('receiving message from ws: ', message)
-    //   );
+    this.initialzeDeckTypesData();
+    this.getAction();
+  }
 
+  private getAction() {
     this.communicationService
       .getAction$()
       .pipe(takeUntil(this.notifier$))
       .subscribe((data) => {
-        this.createSession();
+        switch (data) {
+          case 'createSession':
+            this.createSession();
+            break;
+        }
       });
   }
 
   ngOnDestroy(): void {
     this.notifier$.next();
     this.notifier$.complete();
+  }
+
+  initialzeDeckTypesData() {
+    this.deckTypes = [
+      { description: 'standard', id: 0 },
+      { description: 'custom', id: 1 },
+      { description: 'spanish', id: 2 },
+    ];
   }
 
   manageAction(actionType: string) {
@@ -53,9 +66,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   createSession() {
+    const sessionDialogData = {
+      data: this.deckTypes,
+      ...this.configService.config.app.modalConfig,
+    };
     const dialogRef = this.dialog.open(
       CreateSessionDialogComponent,
-      this.configService.config.app.modalConfig
+      sessionDialogData
     );
 
     dialogRef

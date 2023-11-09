@@ -28,7 +28,7 @@ export class ConfigService {
           resolveInit(true);
         })
         .catch(() => {
-          console.log('Error loading configuration file.');
+          console.error('Error loading configuration file.');
           rejectInit();
         });
     });

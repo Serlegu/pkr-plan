@@ -10,6 +10,7 @@
             formControlName="title"
             placeholder="Enter Title"
             required
+            cdkFocusInitial
           />
           <mat-error *ngIf="sessionForm.get('title')?.hasError('required')">
             Title is required
@@ -27,7 +28,7 @@
           >
             <mat-option
               [value]="deck.description"
-              *ngFor="let deck of this.deckTypes"
+              *ngFor="let deck of data"
               >{{ deck.description }}</mat-option
             >
           </mat-select>

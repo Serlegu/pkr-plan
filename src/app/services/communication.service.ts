@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
-import { Observable, ReplaySubject } from 'rxjs';
+import { BehaviorSubject, Observable, ReplaySubject, Subject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class CommunicationService {
-  private communicationSubject: ReplaySubject<string> =
-    new ReplaySubject<string>(1);
+  private communicationSubject: Subject<string> = new Subject<string> ();
 
   performAction(action: string): void {
     this.communicationSubject.next(action);

@@ -1,11 +1,12 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import {
   UntypedFormBuilder,
   UntypedFormGroup,
   Validators,
 } from '@angular/forms';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Subject } from 'rxjs';
+import { IDeckType } from 'src/app/models/deck-type.interface';
 
 @Component({
   selector: 'pkr-create-session-dialog',
@@ -16,15 +17,11 @@ export class CreateSessionDialogComponent implements OnInit, OnDestroy {
   sessionForm: UntypedFormGroup;
   private readonly notifier$ = new Subject<void>();
 
-  deckTypes: any[] = [
-    { description: 'standard', id: 0 },
-    { description: 'custom', is: 1 },
-    { description: 'spanish', is: 2 },
-  ];
-
-  constructor(
+    constructor(
     private readonly dialogRef: MatDialogRef<CreateSessionDialogComponent>,
-    private readonly formBuilder: UntypedFormBuilder
+    private readonly formBuilder: UntypedFormBuilder,
+    @Inject(MAT_DIALOG_DATA) public data: any
+
   ) {}
 
   ngOnInit(): void {

@@ -1,8 +1,5 @@
 <mat-toolbar class="header__container">
-  <pkr-menu
-    (createSessionClicked)="createSession('create')"
-    (enterSessionClicked)="enterSession('enter')"
-  ></pkr-menu>
+  <pkr-menu [items]="menuItems" (itemMenuClicked)="performAction('create')"></pkr-menu>
   <span class="header__title">Poker Planning</span>
   <span class="header__spacer"></span>
   <button
