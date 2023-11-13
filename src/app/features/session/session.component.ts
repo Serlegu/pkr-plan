@@ -1,5 +1,11 @@
 import { Clipboard } from '@angular/cdk/clipboard';
-import { Component, Input, OnInit, numberAttribute } from '@angular/core';
+import {
+  Component,
+  Input,
+  OnInit,
+  inject,
+  numberAttribute,
+} from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { ActivatedRoute, ParamMap, Router } from '@angular/router';
 import { Subject, filter, of, pipe, switchMap, takeUntil } from 'rxjs';
@@ -18,6 +24,16 @@ import { EnterSessionDialogComponent } from './components/enter-session-dialog/e
   styleUrls: ['./session.component.scss'],
 })
 export class SessionComponent implements OnInit {
+  private clipboard: Clipboard = inject(Clipboard);
+  private configService: ConfigService = inject(ConfigService);
+  public dialog: MatDialog = inject(MatDialog);
+  private route: ActivatedRoute = inject(ActivatedRoute);
+  private router: Router = inject(Router);
+  private readonly sessionService: SessionService = inject(SessionService);
+  private readonly modalInfoService: ModalInfoService =
+    inject(ModalInfoService);
+  private readonly socketService: SocketService = inject(SocketService);
+
   @Input({ transform: numberAttribute }) id = 0;
 
   current = {} as ISession;
@@ -25,22 +41,13 @@ export class SessionComponent implements OnInit {
 
   private readonly notifier$ = new Subject<void>();
 
-  constructor(
-    private clipboard: Clipboard,
-    private configService: ConfigService,
-    public dialog: MatDialog,
-    private route: ActivatedRoute,
-    private router: Router,
-    private readonly sessionService: SessionService,
-    private readonly modalInfoService: ModalInfoService,
-    private readonly socketService: SocketService
-  ) {}
-
   ngOnInit(): void {
     this.getSessionUpdatedMessage();
-
     this.getSessionDeletedMessage();
+    this.manageSession();
+  }
 
+  private manageSession() {
     this.route.queryParamMap
       .pipe(
         switchMap((queryParam: ParamMap) => {

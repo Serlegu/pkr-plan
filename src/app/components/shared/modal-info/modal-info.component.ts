@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 export interface IModalData {
@@ -13,8 +13,9 @@ export interface IModalData {
   styleUrls: ['./modal-info.component.scss'],
 })
 export class ModalInfoComponent {
+  public dialogRef: MatDialogRef<ModalInfoComponent> = inject(MatDialogRef);
+
   constructor(
-    public dialogRef: MatDialogRef<ModalInfoComponent>,
     @Inject(MAT_DIALOG_DATA) public data: IModalData
   ) {  }
 

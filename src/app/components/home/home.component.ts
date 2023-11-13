@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { Subject, filter, switchMap, takeUntil } from 'rxjs';
@@ -14,17 +14,15 @@ import { IDeckType } from 'src/app/models/deck-type.interface';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit, OnDestroy {
+  private readonly communicationService = inject(CommunicationService);
+  private readonly router = inject(Router);
+  private readonly configService = inject(ConfigService);
+  private readonly sessionService = inject(SessionService);
+  public dialog = inject(MatDialog);
+
   receivedData: string;
   deckTypes: IDeckType[] = [];
   private readonly notifier$ = new Subject<void>();
-
-  constructor(
-    public dialog: MatDialog,
-    private router: Router,
-    private configService: ConfigService,
-    private communicationService: CommunicationService,
-    private readonly sessionService: SessionService
-  ) {}
 
   ngOnInit(): void {
     this.initialzeDeckTypesData();

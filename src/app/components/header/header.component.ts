@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommunicationService } from '../../services/communication.service';
 import { IMenuItem } from 'src/app/models/menu-item.interface';
 
@@ -8,17 +8,21 @@ import { IMenuItem } from 'src/app/models/menu-item.interface';
   styleUrls: ['./header.component.scss'],
 })
 export class HeaderComponent implements OnInit {
-  
-  menuItems :IMenuItem[] = [];
-  
-  constructor(private readonly communicationService: CommunicationService) {}
+  private readonly communicationService = inject(CommunicationService);
+  menuItems: IMenuItem[] = [];
 
   ngOnInit(): void {
     this.initializeMenuItems();
   }
 
   initializeMenuItems() {
-    this.menuItems = [{icon:"login", literal: "Create Session", clickAction: (action) =>  this.performAction(action)}]
+    this.menuItems = [
+      {
+        icon: 'login',
+        literal: 'Create Session',
+        clickAction: (action) => this.performAction(action),
+      },
+    ];
   }
 
   performAction(event: string) {
